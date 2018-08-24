@@ -72,24 +72,34 @@ class App extends React.Component {
   }
 }
 
-const Router = ({ createReducer, sceneStyle, scenes, uriPrefix, navigator, getSceneStyle, children, state, dispatch, onDeepLink, wrapBy = props => props, ...props }) => {
+const Router = ({ onStateChange, createReducer, sceneStyle, scenes, uriPrefix, navigator, getSceneStyle, children, state, dispatch, onDeepLink, wrapBy = props => props, ...props }) => {
   const data = { ...props };
+
   if (getSceneStyle) {
     data.cardStyle = getSceneStyle(props);
   }
+
   if (sceneStyle) {
     data.cardStyle = sceneStyle;
   }
+
   const AppNavigator = scenes || navigator || navigationStore.create(children, data, wrapBy);
   navigationStore.reducer = createReducer && createReducer(props);
+
+  if(onStateChange) {
+    navigationStore.onStateChange = onStateChange;
+  }
+
   if (dispatch && state) {
     // set external state and dispatch
     navigationStore.setState(state);
     navigationStore.dispatch = dispatch;
     return <AppNavigator navigation={addNavigationHelpers({ dispatch, state })} uriPrefix={uriPrefix} />;
   }
+
   return <App {...props} onDeepLink={onDeepLink} navigator={AppNavigator} uriPrefix={uriPrefix} />;
 };
+
 Router.propTypes = {
   createReducer: PropTypes.func,
   dispatch: PropTypes.func,
@@ -102,6 +112,7 @@ Router.propTypes = {
   children: PropTypes.element,
   uriPrefix: PropTypes.string,
   onDeepLink: PropTypes.func,
+  onStateChange: PropTypes.func,
 };
 
 export default Router;

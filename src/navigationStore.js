@@ -369,6 +369,8 @@ class NavigationStore {
   @observable prevScene = '';
   @observable currentParams;
 
+  onStateChange = null;
+
   get state() {
     const scene = this.currentScene;// eslint-disable-line no-unused-vars
     const params = this.currentParams;// eslint-disable-line no-unused-vars
@@ -606,6 +608,10 @@ class NavigationStore {
           } catch (e) {
             failure({ error: e.message });
           }
+        }
+
+        if(this.onStateChange) {
+          this.onStateChange(prevScene, this._state, action);
         }
       }
     }
